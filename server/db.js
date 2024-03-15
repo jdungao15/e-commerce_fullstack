@@ -1,17 +1,16 @@
-require('dotenv').config();
-const pg = require('pg');
-const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/ecommerce_db');
-const uuid = require('uuid');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const JWT = process.env.JWT_SECRET_KEY || 'supersecretkey';
-const { userData } = require('./utils');
-
+require("dotenv").config();
+const pg = require("pg");
+const client = new pg.Client(
+  process.env.DATABASE_URL || "postgres://localhost/ecommerce_db"
+);
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const JWT = process.env.JWT_SECRET_KEY || "supersecretkey";
+const { userData } = require("./db.utils");
 
 const createTables = async () => {
-
-    // Only use this function to drop tables and recreate them
-    const SQL = `
+  // Only use this function to drop tables and recreate them
+  const SQL = `
         DROP TABLE IF EXISTS order_items;
         DROP TABLE IF EXISTS orders;
         DROP TABLE IF EXISTS cart_items;
@@ -22,80 +21,108 @@ const createTables = async () => {
         DROP TABLE IF EXISTS roles;
 
         CREATE TABLE users (
-            id UUID PRIMARY KEY,
-            first_name VARCHAR(100),
-            last_name VARCHAR(100),
-            email VARCHAR(100) UNIQUE NOT NULL,
-            password VARCHAR(100) NOT NULL,
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            first_name VARCHAR(50) NOT NULL,
+            last_name VARCHAR(50) NOT NULL,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE roles (
-            id UUID PRIMARY KEY,
-            role VARCHAR(100) UNIQUE NOT NULL
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(50) UNIQUE
         );
-
-        CREATE TABLE user_roles (
-            id UUID PRIMARY KEY,
+          
+        CREATE TABLE IF NOT EXISTS user_roles (
+            id SERIAL PRIMARY KEY,
             user_id UUID REFERENCES users(id),
-            role_id UUID REFERENCES roles(id)
-        );
-
-        CREATE TABLE products (
-            id UUID PRIMARY KEY,
-            name VARCHAR(100) UNIQUE NOT NULL,
-            description TEXT,
-            price DECIMAL NOT NULL,
-            category VARCHAR(100),
-            image_url TEXT
-        );
-
-        CREATE TABLE carts (
-            id UUID PRIMARY KEY,
+            role_id INT REFERENCES roles(id)
+          );
+          
+          CREATE TABLE IF NOT EXISTS products (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(50),
+            descriptions TEXT,
+            price DECIMAL(10,2),
+            stock_quantity INT,
+            image_url VARCHAR(255)
+          );
+          
+          CREATE TABLE IF NOT EXISTS carts (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
             user_id UUID REFERENCES users(id)
-        );
-
-        CREATE TABLE cart_items (
-            id UUID PRIMARY KEY,
+          );
+          
+          CREATE TABLE IF NOT EXISTS cart_items (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
             cart_id UUID REFERENCES carts(id),
-            product_id UUID REFERENCES products(id),
-            quantity INTEGER
-        );
-
-        CREATE TABLE orders (
-            id UUID PRIMARY KEY,
+            product_id INT REFERENCES products(id),
+            quantity INT
+          );
+          
+          CREATE TABLE IF NOT EXISTS orders (
+            id SERIAL PRIMARY KEY,
             user_id UUID REFERENCES users(id),
-            order_date DATE
-        );
-
-        CREATE TABLE order_items (
-            id UUID PRIMARY KEY,
-            order_id UUID REFERENCES orders(id),
-            product_id UUID REFERENCES products(id),
-            quantity INTEGER
-        );
-        
+            total_price DECIMAL,
+            order_date TIMESTAMP,
+            status VARCHAR
+          );
+          
+          CREATE TABLE IF NOT EXISTS order_items (
+            id SERIAL PRIMARY KEY,
+            order_id INT REFERENCES orders(id),
+            product_id INT REFERENCES products(id),
+            quantity INT,
+            price DECIMAL
+          );
     `;
-    await client.query(SQL);
-}
+  await client.query(SQL);
+};
+// Create User
 const createUser = async (user) => {
-    console.log(user)
-    const SQL = `
-        INSERT INTO users (id, first_name, last_name, email, password)
-        VALUES ($1, $2, $3, $4, $5)
+  const SQL = `
+        INSERT INTO users (first_name, last_name, email, password)
+        VALUES ($1, $2, $3, $4)
         RETURNING *;
     `;
-    const hash = await bcrypt.hash(user.password, 10);
-    const values = [uuid.v4(), user.first_name, user.last_name, user.email, hash];
-    const response = await client.query(SQL, values);
-    return response.rows[0];
-}
+  const hash = await bcrypt.hash(user.password, 10);
+  const values = [user.first_name, user.last_name, user.email, hash];
+  const response = await client.query(SQL, values);
+  return response.rows[0];
+};
 
+// Get All Products
+const getAllProducts = async () => {
+  const SQL = `SELECT * FROM products;`;
+  const response = await client.query(SQL);
+  return response.rows;
+};
 
-// Use me to seed the database
+// Get Single Product
+const getSingleProduct = async (id) => {
+  const SQL = `SELECT * FROM products WHERE id = $1;`;
+  const response = await client.query(SQL, [id]);
+  return response.rows[0];
+};
+
+// This is for only testing and debugging purposes
+const run = async () => {
+  console.log(await getAllProducts());
+};
+
+// Use this function to seed data
 const seedData = async () => {
-    const users = userData();
-    for (let user of users) {
-        await createUser(user);
-    }
-}
-module.exports = { client, createUser, seedData };
+  const users = userData();
+  for (let user of users) {
+    await createUser(user);
+  }
+};
+module.exports = {
+  client,
+  createUser,
+  seedData,
+  createTables,
+  getAllProducts,
+  getSingleProduct,
+};

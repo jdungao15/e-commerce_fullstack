@@ -1,10 +1,62 @@
-[{"first_name":"Kakalina","last_name":"Elgey","email":"kelgey0@addtoany.com","password":"dV7?W>=J5"},
-{"first_name":"Aldrich","last_name":"Peiser","email":"apeiser1@xinhuanet.com","password":"nR4\\793=I0(4{1ni"},
-{"first_name":"Waylon","last_name":"Cowap","email":"wcowap2@amazon.co.uk","password":"qJ3#fA|k%nT&VH"},
-{"first_name":"Katrinka","last_name":"Larimer","email":"klarimer3@feedburner.com","password":"uE2}#2.t)/</*O<"},
-{"first_name":"Karia","last_name":"Ragless","email":"kragless4@nbcnews.com","password":"yX3{s\"bzY\"|z5q+M"},
-{"first_name":"Giustina","last_name":"Bawle","email":"gbawle5@studiopress.com","password":"gT5|qxr79u*"},
-{"first_name":"Weston","last_name":"Noen","email":"wnoen6@hugedomains.com","password":"iF6{J~Z6qauQe9og"},
-{"first_name":"Cristobal","last_name":"Esslemont","email":"cesslemont7@cloudflare.com","password":"dO4_jE>HD|L%"},
-{"first_name":"Marilyn","last_name":"Praill","email":"mpraill8@bloomberg.com","password":"uZ7%Qr5O"},
-{"first_name":"Jordon","last_name":"Lavender","email":"jlavender9@pen.io","password":"iM2`c1#v"}]
+[
+  {
+    "first_name": "Kakalina",
+    "last_name": "Elgey",
+    "email": "kelgey0@addtoany.com",
+    "password": "dV7?W>=J5"
+  },
+  {
+    "first_name": "Aldrich",
+    "last_name": "Peiser",
+    "email": "apeiser1@xinhuanet.com",
+    "password": "nR4\\793=I0(4{1ni"
+  },
+  {
+    "first_name": "Waylon",
+    "last_name": "Cowap",
+    "email": "wcowap2@amazon.co.uk",
+    "password": "qJ3#fA|k%nT&VH"
+  },
+  {
+    "first_name": "Katrinka",
+    "last_name": "Larimer",
+    "email": "klarimer3@feedburner.com",
+    "password": "uE2}#2.t)/</*O<"
+  },
+  {
+    "first_name": "Karia",
+    "last_name": "Ragless",
+    "email": "kragless4@nbcnews.com",
+    "password": "yX3{s\"bzY\"|z5q+M"
+  },
+  {
+    "first_name": "Giustina",
+    "last_name": "Bawle",
+    "email": "gbawle5@studiopress.com",
+    "password": "gT5|qxr79u*"
+  },
+  {
+    "first_name": "Weston",
+    "last_name": "Noen",
+    "email": "wnoen6@hugedomains.com",
+    "password": "iF6{J~Z6qauQe9og"
+  },
+  {
+    "first_name": "Cristobal",
+    "last_name": "Esslemont",
+    "email": "cesslemont7@cloudflare.com",
+    "password": "dO4_jE>HD|L%"
+  },
+  {
+    "first_name": "Marilyn",
+    "last_name": "Praill",
+    "email": "mpraill8@bloomberg.com",
+    "password": "uZ7%Qr5O"
+  },
+  {
+    "first_name": "Jordon",
+    "last_name": "Lavender",
+    "email": "jlavender9@pen.io",
+    "password": "iM2`c1#v"
+  }
+]
