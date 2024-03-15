@@ -106,6 +106,22 @@ const getSingleProduct = async (id) => {
   return response.rows[0];
 };
 
+const createProduct = async (product) => {
+  const SQL = `
+        INSERT INTO products (name, descriptions, price, stock_quantity, image_url)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *;
+    `;
+  const newProduct = await client.query(SQL, [
+    product.name,
+    product.descriptions,
+    product.price,
+    product.stock_quantity,
+    product.image_url,
+  ]);
+  return newProduct.rows[0];
+};
+
 // This is for only testing and debugging purposes
 const run = async () => {
   console.log(await getAllProducts());
@@ -125,4 +141,5 @@ module.exports = {
   createTables,
   getAllProducts,
   getSingleProduct,
+  createProduct,
 };
