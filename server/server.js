@@ -15,7 +15,6 @@ app.use(express.json());
   // // Seed Data for the first time
   // await seedData();
 
-  //
   app.use(router);
 
   app.listen(PORT, () => {

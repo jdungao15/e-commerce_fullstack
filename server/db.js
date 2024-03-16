@@ -5,7 +5,8 @@ const client = new pg.Client(
 );
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const JWT = process.env.JWT_SECRET_KEY || "supersecretkey";
+const JWT_CLIENT = process.env.JWT_SECRET_CLIENT_KEY || "supersecretkey";
+const JWT_ADMIN = process.env.JWT_SECRET_ADMIN_KEY;
 const { userData } = require("./db.utils");
 
 const createTables = async () => {
@@ -153,6 +154,46 @@ const addItemToCart = async (userId, productId, quantity) => {
   return cartItem.rows[0];
 };
 
+const authenticate = async (email, password) => {
+  const user = await client.query(
+    `
+        SELECT * FROM users WHERE email = $1
+    `,
+    [email]
+  );
+  if (user.rows.length === 0) {
+    throw Error("User not found");
+  }
+  const match = await bcrypt.compare(password, user.rows[0].password);
+  if (match) {
+    const token = jwt.sign(
+      { user: user.rows[0] },
+      user.rows[0].is_admin ? JWT_ADMIN : JWT_CLIENT
+    );
+    return token;
+  } else {
+    throw Error("Password doesn't match");
+  }
+};
+
+const findUserByToken = async (token) => {
+  try {
+    const payload = jwt.verify(token, JWT_CLIENT);
+    return payload;
+  } catch (error) {
+    throw Error("Invalid Token");
+  }
+};
+
+const findUserByTokenAdmin = async (token) => {
+  try {
+    const payload = jwt.verify(token, JWT_ADMIN);
+    return payload;
+  } catch (error) {
+    throw Error("Invalid Token");
+  }
+};
+
 // This is for only testing and debugging purposes
 const run = async () => {
   console.log(await getAllProducts());
@@ -176,4 +217,8 @@ module.exports = {
   deleteProduct,
   addItemToCart,
   getAllUsers,
+  authenticate,
+  findUserByToken,
+  findUserByTokenAdmin,
+  authenticate,
 };
