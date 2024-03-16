@@ -16,9 +16,7 @@ const createTables = async () => {
         DROP TABLE IF EXISTS cart_items;
         DROP TABLE IF EXISTS carts;
         DROP TABLE IF EXISTS products;
-        DROP TABLE IF EXISTS user_roles;
         DROP TABLE IF EXISTS users;
-        DROP TABLE IF EXISTS roles;
 
         CREATE TABLE users (
             id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -26,19 +24,9 @@ const createTables = async () => {
             last_name VARCHAR(50) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
+            is_admin BOOLEAN DEFAULT FALSE,
             date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-
-        CREATE TABLE roles (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(50) UNIQUE
-        );
-          
-        CREATE TABLE IF NOT EXISTS user_roles (
-            id SERIAL PRIMARY KEY,
-            user_id UUID REFERENCES users(id),
-            role_id INT REFERENCES roles(id)
-          );
           
           CREATE TABLE IF NOT EXISTS products (
             id SERIAL PRIMARY KEY,
@@ -84,7 +72,7 @@ const createUser = async (user) => {
   const SQL = `
         INSERT INTO users (first_name, last_name, email, password)
         VALUES ($1, $2, $3, $4)
-        RETURNING *;
+        RETURNING *; 
     `;
   const hash = await bcrypt.hash(user.password, 10);
   const values = [user.first_name, user.last_name, user.email, hash];
@@ -122,6 +110,12 @@ const createProduct = async (product) => {
   return newProduct.rows[0];
 };
 
+const deleteProduct = async (id) => {
+  const SQL = `DELETE FROM products WHERE id = $1;`;
+  const response = await client.query(SQL, [id]);
+  return response;
+};
+
 // This is for only testing and debugging purposes
 const run = async () => {
   console.log(await getAllProducts());
@@ -142,4 +136,5 @@ module.exports = {
   getAllProducts,
   getSingleProduct,
   createProduct,
+  deleteProduct,
 };
