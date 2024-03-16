@@ -80,6 +80,12 @@ const createUser = async (user) => {
   return response.rows[0];
 };
 
+const getAllUsers = async () => {
+  const SQL = `SELECT * FROM users;`;
+  const response = await client.query(SQL);
+  return response.rows;
+};
+
 // Get All Products
 const getAllProducts = async () => {
   const SQL = `SELECT * FROM products;`;
@@ -116,6 +122,37 @@ const deleteProduct = async (id) => {
   return response;
 };
 
+const addItemToCart = async (userId, productId, quantity) => {
+  // Check if the user has a cart
+  let cart = await client.query(
+    `
+        SELECT * FROM carts WHERE user_id = $1
+    `,
+    [userId]
+  );
+
+  // If the user doesn't have a cart, create one
+  if (cart.rows.length === 0) {
+    cart = await client.query(
+      `
+            INSERT INTO carts (user_id) VALUES ($1) RETURNING *
+        `,
+      [userId]
+    );
+  }
+
+  // Add the item to the cart
+  const cartItem = await client.query(
+    `
+        INSERT INTO cart_items (cart_id, product_id, quantity)
+        VALUES ($1, $2, $3) RETURNING *
+    `,
+    [cart.rows[0].id, productId, quantity]
+  );
+
+  return cartItem.rows[0];
+};
+
 // This is for only testing and debugging purposes
 const run = async () => {
   console.log(await getAllProducts());
@@ -137,4 +174,6 @@ module.exports = {
   getSingleProduct,
   createProduct,
   deleteProduct,
+  addItemToCart,
+  getAllUsers,
 };

@@ -4,6 +4,8 @@ const {
   getSingleProduct,
   createProduct,
   deleteProduct,
+  addItemToCart,
+  getAllUsers,
 } = require("./db");
 const router = express.Router();
 
@@ -31,7 +33,31 @@ router.get("/api/products/:id", async (req, res, next) => {
   }
 });
 
+// isLoggedin Middleware
+router.post("/api/users/:id/cart/:product_id", async (req, res, next) => {
+  try {
+    res.send(
+      await addItemToCart(
+        req.params.id,
+        req.params.product_id,
+        req.body.quantity
+      )
+    );
+    res.status(201);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Protected Routes Only for Admins
+router.get("/api/users", async (req, res, next) => {
+  try {
+    res.send(await getAllUsers());
+    res.status(200);
+  } catch (error) {
+    next(error);
+  }
+});
 router.post("/api/products", async (req, res, next) => {
   try {
     res.send(await createProduct(req.body));
